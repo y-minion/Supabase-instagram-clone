@@ -1,4 +1,4 @@
-import Image from "next/image";
+import LogoutButton from "components/logout-button";
 
 export const metadata = {
   title: "Clonestagram",
@@ -6,5 +6,10 @@ export const metadata = {
 };
 
 export default function Home() {
-  return <main>인스타그램</main>;
+  return (
+    <main className="w-full flex flex-col items-center justify-center h-screen gap-2">
+      <h1 className="font-bold text-xl">Welcome {"웅맹잉"}!</h1>
+      <LogoutButton />
+    </main>
+  );
 }
