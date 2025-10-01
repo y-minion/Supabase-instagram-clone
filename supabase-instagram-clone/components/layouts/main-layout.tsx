@@ -1,3 +1,10 @@
+import Sidebar from "components/sidebar";
+
 export default function MainLayout({ children }) {
-  return <main className="">{children}</main>;
+  return (
+    <main className="">
+      <Sidebar />
+      {children}
+    </main>
+  );
 }
