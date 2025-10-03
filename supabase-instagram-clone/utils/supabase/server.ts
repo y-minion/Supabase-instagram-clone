@@ -25,8 +25,9 @@ export const createServerSupabaseClient = async (
             cookieStore.set({ name, value, ...options });
           } catch (error) {
             // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // This can be ignored if you have middleware refreshing user sessions.
+            // 👇 에러가 발생하면 터미널에 출력하도록 로그 추가
+            console.error('>>> Cookie "set" failed in Server Client:', error);
           }
         },
         remove(name: string, options: CookieOptions) {
@@ -36,6 +37,11 @@ export const createServerSupabaseClient = async (
             // The `delete` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
+            // 👇 에러가 발생하면 터미널에 출력하도록 로그 추가
+            console.error(
+              '>>> Cookie "remove" failed in Server Client:',
+              error
+            );
           }
         },
       },
