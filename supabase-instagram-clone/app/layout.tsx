@@ -31,18 +31,18 @@ export default async function RootLayout({
 }>) {
   const supabase = await createServerSupabaseClient();
   const {
-    data: { session },
+    data: { user },
     error,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
 
   if (error) {
     console.log(`에러발생:${error}`);
   }
 
-  if (session) {
-    console.log(session);
+  if (user) {
+    console.log(user);
   } else {
-    console.log("비어있는 세션");
+    console.log("유저 권한 없음");
   }
 
   return (
@@ -62,7 +62,7 @@ export default async function RootLayout({
         <RecoilProvider>
           <ReactQueryClientProvider>
             <ThemeProvider>
-              {session?.user ? <MainLayout>{children}</MainLayout> : <Auth />}
+              {user ? <MainLayout>{children}</MainLayout> : <Auth />}
             </ThemeProvider>
           </ReactQueryClientProvider>
         </RecoilProvider>
