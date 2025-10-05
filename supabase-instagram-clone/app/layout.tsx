@@ -7,6 +7,7 @@ import RecoilProvider from "config/RecoilProvider";
 import Auth from "components/auth";
 import MainLayout from "components/layouts/main-layout";
 import { createServerSupabaseClient } from "utils/supabase/server";
+import AuthProvider from "config/auth-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,6 +36,10 @@ export default async function RootLayout({
     error,
   } = await supabase.auth.getUser();
 
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   if (error) {
     console.log(`에러발생:${error}`);
   }
@@ -62,7 +67,9 @@ export default async function RootLayout({
         <RecoilProvider>
           <ReactQueryClientProvider>
             <ThemeProvider>
-              {user ? <MainLayout>{children}</MainLayout> : <Auth />}
+              <AuthProvider accessToken={session?.access_token}>
+                {user ? <MainLayout>{children}</MainLayout> : <Auth />}
+              </AuthProvider>
             </ThemeProvider>
           </ReactQueryClientProvider>
         </RecoilProvider>

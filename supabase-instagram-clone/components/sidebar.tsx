@@ -2,8 +2,11 @@
 
 import { Home, Logout, People, Search, Send } from "@mui/icons-material";
 import Link from "next/link";
+import { createBrowserSupabaseClient } from "utils/supabase/client";
 
 export default function Sidebar() {
+  const supabase = createBrowserSupabaseClient();
+
   return (
     <aside className="w-fit flex flex-col justify-between h-screen p-6 border-r border-gray-300">
       {/* Home 버튼 + People Page ~ Chat Page */}
@@ -24,7 +27,7 @@ export default function Sidebar() {
 
       {/* 로그아웃 버튼 */}
       <div>
-        <button onClick={() => console.log("로그아웃")}>
+        <button onClick={async () => supabase.auth.signOut()}>
           <Logout className="text-2xl" />
         </button>
       </div>
