@@ -21,6 +21,7 @@ export default function SignUp({ setView }) {
         email,
         password,
         options: {
+          //이메일 인증으로 부터 받은 code를 추출하여 세션으로 교환을 하는 라우터
           emailRedirectTo: "http://localhost:3000/signup/confirm",
         },
       });
