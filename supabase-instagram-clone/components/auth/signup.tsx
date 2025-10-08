@@ -13,6 +13,17 @@ export default function SignUp({ setView }) {
 
   const supabase = createBrowserSupabaseClient(); //클라이언트 컴포넌트에서 수파베이스 api사용 하기 위한 호출
 
+  const signWithKakao = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: {
+        redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback` //실제 서비스 배포할 경우
+          : `http://localhost:3000/auth/callback`, //dev환경
+      },
+    });
+  };
+
   //signup mutation
   const signupMutation = useMutation({
     mutationFn: async () => {
@@ -108,6 +119,12 @@ export default function SignUp({ setView }) {
           className="w-full rounded-sm py-1 text-md"
         >
           {confirmationRequired ? "인증하기" : "가입하기"}
+        </Button>
+        <Button
+          onClick={() => signWithKakao()}
+          className="w-full rounded-sm py-1 text-md bg-yellow-600"
+        >
+          카카오톡으로 가입하기
         </Button>
       </div>
       <div className="py-4 w-full text-center max-w-lg border border-gray-400 bg-white">
