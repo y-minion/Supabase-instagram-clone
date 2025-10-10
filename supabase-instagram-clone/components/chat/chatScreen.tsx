@@ -3,22 +3,35 @@
 import { useRecoilValue } from "recoil";
 import Message from "./message";
 import Person from "./person";
-import { select } from "@material-tailwind/react";
-import { selectedIndexState } from "utils/recoil/atoms";
+import { selectedUserIdState } from "utils/recoil/atoms";
+import { useQuery } from "@tanstack/react-query";
+import { getUserById } from "actions/chatActions";
+import { useEffect } from "react";
 
 export default function ChatScreen() {
-  const selectedIndex = useRecoilValue(selectedIndexState);
+  const selectedUserId = useRecoilValue(selectedUserIdState);
 
-  return selectedIndex !== null ? (
+  const selectedUserQuery = useQuery({
+    queryKey: ["user", selectedUserId],
+    queryFn: async () => {
+      return getUserById(selectedUserId.toString());
+    },
+  });
+
+  useEffect(() => {
+    console.log(`채팅 쿼리 : ${selectedUserQuery.data}`);
+  }, [selectedUserQuery.data]);
+
+  return selectedUserQuery.data ? (
     <div className="w-full h-screen flex flex-col">
       {/* 유저 영역 */}
       <Person
-        index={selectedIndex}
+        index={0}
         isActive={false}
-        name={"이안"}
+        name={selectedUserQuery.data?.email?.split("@")?.[0]}
         onChatScreen={true}
         onlineAt={new Date().toISOString()}
-        userId={"ads"}
+        userId={selectedUserQuery.data?.id}
       />
 
       {/* 채팅 영역 */}
