@@ -1,32 +1,41 @@
 "use client";
 
-import { selectedIndexState } from "utils/recoil/atoms";
+import { selectedUserIdState } from "utils/recoil/atoms";
 import Person from "./person";
 import { useRecoilState } from "recoil";
+import { useQuery } from "@tanstack/react-query";
+import { getAllUsers } from "actions/chatActions";
 
-export default function ChatPeopleList() {
-  const [selectedIndex, setSelectedIndex] = useRecoilState(selectedIndexState);
+export default function ChatPeopleList({ loggedInUser }) {
+  const [selectedUserId, setSelectedUserId] =
+    useRecoilState(selectedUserIdState);
+
+  //getAllUsers
+  const getAllUsersQuery = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const allUsers = await getAllUsers();
+      console.log(allUsers);
+      return allUsers.filter(({ id }) => id !== loggedInUser?.id);
+    },
+  });
 
   return (
     <div className="h-screen min-w-60 flex flex-col bg-gray-50">
-      <Person
-        onClick={() => setSelectedIndex(0)}
-        index={0}
-        isActive={selectedIndex === 0}
-        name={"이안"}
-        onChatScreen={false}
-        onlineAt={new Date().toISOString()}
-        userId={"ads"}
-      />
-      <Person
-        onClick={() => setSelectedIndex(1)}
-        index={0}
-        isActive={selectedIndex === 1}
-        name={"웅이에"}
-        onChatScreen={false}
-        onlineAt={new Date().toISOString()}
-        userId={"ads"}
-      />
+      {getAllUsersQuery.data?.map((user, idx) => {
+        return (
+          <Person
+            key={user.id}
+            onClick={() => setSelectedUserId(user.id)}
+            index={idx}
+            isActive={selectedUserId === Number(user.id)}
+            name={user.email.split("@")[0]}
+            onChatScreen={false}
+            onlineAt={new Date().toISOString()}
+            userId={user.id}
+          />
+        );
+      })}
     </div>
   );
 }
