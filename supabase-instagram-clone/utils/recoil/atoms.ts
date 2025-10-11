@@ -7,5 +7,5 @@ export const searchState = atom({
 
 export const selectedUserIdState = atom({
   key: "selectedUserIdState",
-  default: 0,
+  default: "",
 });

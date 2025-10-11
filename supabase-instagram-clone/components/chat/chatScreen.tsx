@@ -14,7 +14,7 @@ export default function ChatScreen() {
   const selectedUserQuery = useQuery({
     queryKey: ["user", selectedUserId],
     queryFn: async () => {
-      return getUserById(selectedUserId.toString());
+      return getUserById(selectedUserId);
     },
   });
 

@@ -15,7 +15,7 @@ export default function ChatPeopleList({ loggedInUser }) {
     queryKey: ["users"],
     queryFn: async () => {
       const allUsers = await getAllUsers();
-      console.log(allUsers);
+      console.log(`getAllUsers경과${allUsers}`);
       return allUsers.filter(({ id }) => id !== loggedInUser?.id);
     },
   });
@@ -28,7 +28,7 @@ export default function ChatPeopleList({ loggedInUser }) {
             key={user.id}
             onClick={() => setSelectedUserId(user.id)}
             index={idx}
-            isActive={selectedUserId === Number(user.id)}
+            isActive={selectedUserId === user.id}
             name={user.email.split("@")[0]}
             onChatScreen={false}
             onlineAt={new Date().toISOString()}
