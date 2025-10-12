@@ -11,11 +11,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllMessages, getUserById, sendMessage } from "actions/chatActions";
 import { useEffect, useState } from "react";
 import { Spinner } from "@material-tailwind/react";
+import { createBrowserSupabaseClient } from "utils/supabase/client";
 
 export default function ChatScreen() {
   const selectedUserId = useRecoilValue(selectedUserIdState);
   const [message, setMessage] = useState("");
   const selectedUserIndex = useRecoilValue(selectedUserIndexState);
+  const supabase = createBrowserSupabaseClient();
 
   const selectedUserQuery = useQuery({
     queryKey: ["user", selectedUserId],
@@ -43,6 +45,35 @@ export default function ChatScreen() {
       return getAllMessages({ chatUserId: selectedUserId });
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("message_postgres_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "message",
+        },
+        (payload) => {
+          // 페이로드가 존재할 경우 해당 로직 실행
+          if (
+            payload.eventType === "INSERT" &&
+            !payload.errors &&
+            !!payload.new
+          ) {
+            // 위의 조건들을 만족하면 이 채널을 구독하고 있는 컴포넌트에서 메세지데이터를 불러오는 쿼리를 리패치한다.
+            getAllMessagesQuery.refetch();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     console.log(`채팅 쿼리 : ${selectedUserQuery.data}`);
