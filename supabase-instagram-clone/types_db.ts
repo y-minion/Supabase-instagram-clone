@@ -19,25 +19,25 @@ export type Database = {
           created_at: string;
           id: number;
           is_deleted: boolean;
+          message: string;
           receiver: string;
           sender: string;
-          text: string;
         };
         Insert: {
           created_at?: string;
           id?: number;
           is_deleted?: boolean;
+          message: string;
           receiver?: string;
           sender?: string;
-          text: string;
         };
         Update: {
           created_at?: string;
           id?: number;
           is_deleted?: boolean;
+          message?: string;
           receiver?: string;
           sender?: string;
-          text?: string;
         };
         Relationships: [];
       };
