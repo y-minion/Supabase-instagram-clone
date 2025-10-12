@@ -10,6 +10,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllMessages, getUserById, sendMessage } from "actions/chatActions";
 import { useEffect, useState } from "react";
+import { Spinner } from "@material-tailwind/react";
 
 export default function ChatScreen() {
   const selectedUserId = useRecoilValue(selectedUserIdState);
@@ -61,21 +62,13 @@ export default function ChatScreen() {
 
       {/* 채팅 영역 */}
       <div className="flex overflow-y-scroll flex-col flex-1 p-4 gap-2">
-        <Message isFromMe={true} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
-        <Message isFromMe={false} message={"안녕하세요"} />
+        {getAllMessagesQuery.data?.map((message) => (
+          <Message
+            key={message.id}
+            message={message.message}
+            isFromMe={message.receiver === selectedUserId}
+          />
+        ))}
       </div>
 
       {/* 채팅창 영역 */}
@@ -89,8 +82,9 @@ export default function ChatScreen() {
         <button
           className="min-w-20 p-3 bg-light-blue-500 text-white"
           color="light-blue"
+          onClick={() => sendMessageMutation.mutate()}
         >
-          <span>전송</span>
+          {sendMessageMutation.isPending ? <Spinner /> : <span>전송</span>}
         </button>
       </div>
     </div>
