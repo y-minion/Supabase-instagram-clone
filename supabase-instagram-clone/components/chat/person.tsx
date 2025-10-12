@@ -34,7 +34,7 @@ export default function Person({
       <div className="flex flex-col items-start ">
         <p className="text-black font-bold text-lg">{name}</p>
         <p className="text-gray-500 text-sm">
-          {timeAgo.format(Date.parse(onlineAt))}
+          {onlineAt && timeAgo.format(Date.parse(onlineAt))}
         </p>
       </div>
     </div>

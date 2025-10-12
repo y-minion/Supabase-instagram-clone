@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  presenceState,
   selectedUserIdState,
   selectedUserIndexState,
 } from "utils/recoil/atoms";
@@ -8,14 +9,14 @@ import Person from "./person";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUsers } from "actions/chatActions";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 
 export default function ChatPeopleList({ loggedInUser }) {
   const [selectedUserId, setSelectedUserId] =
     useRecoilState(selectedUserIdState);
   const setSelectedUserIndex = useSetRecoilState(selectedUserIndexState);
-
+  const [presence, setPresence] = useRecoilState(presenceState);
   const supabase = createBrowserSupabaseClient();
 
   //getAllUsers
@@ -41,7 +42,9 @@ export default function ChatPeopleList({ loggedInUser }) {
     //같은 채널의 유저의 상태에 대해 구독
     channel.on("presence", { event: "sync" }, () => {
       const newState = channel.presenceState();
+      const newStateObj = JSON.parse(JSON.stringify(newState));
       console.log(newState);
+      setPresence(newStateObj);
     });
 
     channel.subscribe(async (status) => {
@@ -74,7 +77,7 @@ export default function ChatPeopleList({ loggedInUser }) {
             isActive={selectedUserId === user.id}
             name={user.email.split("@")[0]}
             onChatScreen={false}
-            onlineAt={new Date().toISOString()}
+            onlineAt={presence?.[user.id]?.[0]?.onlineAt}
             userId={user.id}
           />
         );

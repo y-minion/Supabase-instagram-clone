@@ -14,3 +14,8 @@ export const selectedUserIndexState = atom({
   key: "selectedUserIndex",
   default: 0,
 });
+
+export const presenceState = atom({
+  key: "presenceState",
+  default: null,
+});
