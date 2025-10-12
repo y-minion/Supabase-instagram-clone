@@ -4,20 +4,73 @@ import { useRecoilValue } from "recoil";
 import Message from "./message";
 import Person from "./person";
 import {
+  presenceState,
   selectedUserIdState,
   selectedUserIndexState,
 } from "utils/recoil/atoms";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getAllMessages, getUserById, sendMessage } from "actions/chatActions";
+import { getUserById } from "actions/chatActions";
 import { useEffect, useState } from "react";
 import { Spinner } from "@material-tailwind/react";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
+
+export async function sendMessage({ message, chatUserId }) {
+  const supabase = createBrowserSupabaseClient(); // 현재 접속한 계정이 누구인지 알기위해서 반드시 admin이 아닌 일반 서버 클라이언트를 생성해야한다.
+
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error || !session.user) {
+    throw new Error("User is not authenticated");
+  }
+
+  const { data, error: sendMessageError } = await supabase
+    .from("message")
+    .insert({
+      message,
+      receiver: chatUserId,
+      // sender: session.user.id,
+    });
+
+  if (sendMessageError) {
+    throw new Error(sendMessageError.message);
+  }
+
+  return data;
+}
+
+export async function getAllMessages({ chatUserId }) {
+  const supabase = createBrowserSupabaseClient();
+
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error || !session.user) {
+    throw new Error("User is not authenticated");
+  }
+
+  const { data, error: getMessagesError } = await supabase
+    .from("message")
+    .select("*")
+    .or(`receiver.eq.${session.user.id},receiver.eq.${chatUserId}`)
+    .or(`sender.eq.${session.user.id},sender.eq.${chatUserId}`)
+    .order("created_at", { ascending: true });
+
+  if (getMessagesError) return [];
+
+  return data;
+}
 
 export default function ChatScreen() {
   const selectedUserId = useRecoilValue(selectedUserIdState);
   const [message, setMessage] = useState("");
   const selectedUserIndex = useRecoilValue(selectedUserIndexState);
   const supabase = createBrowserSupabaseClient();
+  const presence = useRecoilValue(presenceState);
 
   const selectedUserQuery = useQuery({
     queryKey: ["user", selectedUserId],
@@ -87,7 +140,7 @@ export default function ChatScreen() {
         isActive={false}
         name={selectedUserQuery.data?.email?.split("@")?.[0]}
         onChatScreen={true}
-        onlineAt={new Date().toISOString()}
+        onlineAt={presence?.[selectedUserId]?.[0]?.onlineAt}
         userId={selectedUserQuery.data?.id}
       />
 
