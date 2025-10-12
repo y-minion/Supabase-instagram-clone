@@ -1,14 +1,18 @@
 "use client";
 
-import { selectedUserIdState } from "utils/recoil/atoms";
+import {
+  selectedUserIdState,
+  selectedUserIndexState,
+} from "utils/recoil/atoms";
 import Person from "./person";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { useQuery } from "@tanstack/react-query";
 import { getAllUsers } from "actions/chatActions";
 
 export default function ChatPeopleList({ loggedInUser }) {
   const [selectedUserId, setSelectedUserId] =
     useRecoilState(selectedUserIdState);
+  const setSelectedUserIndex = useSetRecoilState(selectedUserIndexState);
 
   //getAllUsers
   const getAllUsersQuery = useQuery({
@@ -26,7 +30,10 @@ export default function ChatPeopleList({ loggedInUser }) {
         return (
           <Person
             key={user.id}
-            onClick={() => setSelectedUserId(user.id)}
+            onClick={() => {
+              setSelectedUserId(user.id);
+              setSelectedUserIndex(idx);
+            }}
             index={idx}
             isActive={selectedUserId === user.id}
             name={user.email.split("@")[0]}

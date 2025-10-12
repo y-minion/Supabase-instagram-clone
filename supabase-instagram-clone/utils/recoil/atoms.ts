@@ -10,7 +10,7 @@ export const selectedUserIdState = atom({
   default: "",
 });
 
-export const selectedUserIndex = atom({
+export const selectedUserIndexState = atom({
   key: "selectedUserIndex",
   default: 0,
 });
